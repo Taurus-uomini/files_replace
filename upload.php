@@ -8,7 +8,20 @@
             if($zip->open($files['tmp_name']) === true)
             {
                 $filepath = md5(time().$files['name']);
-                $zip->extractTo($filepath);
+                mkdir($filepath);
+                for($i=0;$i<$zip->numFiles;++$i)
+                {
+                    $filename = $zip->getNameIndex($i);
+                    $fileinfo = pathinfo($filename);
+                    if(!file_exists($filepath.'/'.$fileinfo['dirname']))
+                    {
+                        mkdir($filepath.'/'.$fileinfo['dirname']);
+                    }
+                    if($filename[strlen($filename)-1]!='/')
+                    {
+                        copy('zip://'.$files['tmp_name'].'#'.$filename,$filepath.'/'.$fileinfo['dirname'].'/'.$fileinfo['basename']);
+                    }
+                }
                 $zip->close();
                 return $filepath;
             }
